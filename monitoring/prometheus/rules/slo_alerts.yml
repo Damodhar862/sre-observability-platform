@@ -1,0 +1,48 @@
+# Multi-window, multi-burn-rate alerts (Google SRE Workbook, "Alerting on SLOs")
+# Error budget = 0.005. Burn rate 14.4 => 2% of a 30-day budget spent in 1 hour.
+groups:
+  - name: orders-slo-alerts
+    rules:
+      - alert: OrdersErrorBudgetFastBurn
+        expr: |
+          sli:orders_errors:ratio_rate1h > (14.4 * 0.005)
+          and
+          sli:orders_errors:ratio_rate5m > (14.4 * 0.005)
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "orders-service is burning error budget fast (14.4x)"
+          description: "5xx ratio over 1h is {{ $value | humanizePercentage }}."
+          runbook: "docs/runbooks/error-budget-burn.md"
+
+      - alert: OrdersErrorBudgetSlowBurn
+        expr: |
+          sli:orders_errors:ratio_rate6h > (6 * 0.005)
+          and
+          sli:orders_errors:ratio_rate30m > (6 * 0.005)
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "orders-service is burning error budget steadily (6x)"
+          runbook: "docs/runbooks/error-budget-burn.md"
+
+      - alert: OrdersHighLatencyP95
+        expr: sli:orders_latency:p95_5m > 0.3
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "orders-service p95 latency above 300ms"
+          description: "p95 is {{ $value | humanizeDuration }}."
+          runbook: "docs/runbooks/high-latency.md"
+
+      - alert: OrdersServiceDown
+        expr: up{job="orders-service"} == 0
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: "Prometheus cannot scrape orders-service"
+          runbook: "docs/runbooks/service-down.md"

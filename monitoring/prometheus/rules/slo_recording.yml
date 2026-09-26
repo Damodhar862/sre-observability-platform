@@ -1,0 +1,29 @@
+# SLO 1: 99.5% of /orders requests succeed (non-5xx) -> error budget = 0.5%
+# SLO 2: 95% of /orders requests complete in < 300ms
+groups:
+  - name: orders-slo-recording
+    rules:
+      - record: sli:orders_errors:ratio_rate5m
+        expr: |
+          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[5m]))
+          / sum(rate(http_requests_total{job="orders-service",path="/orders"}[5m]))
+      - record: sli:orders_errors:ratio_rate30m
+        expr: |
+          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[30m]))
+          / sum(rate(http_requests_total{job="orders-service",path="/orders"}[30m]))
+      - record: sli:orders_errors:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[1h]))
+          / sum(rate(http_requests_total{job="orders-service",path="/orders"}[1h]))
+      - record: sli:orders_errors:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[6h]))
+          / sum(rate(http_requests_total{job="orders-service",path="/orders"}[6h]))
+      - record: sli:orders_latency:p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="orders-service",path="/orders"}[5m])))
+      - record: sli:orders_fast_requests:ratio_rate5m
+        expr: |
+          sum(rate(http_request_duration_seconds_bucket{job="orders-service",path="/orders",le="0.3"}[5m]))
+          / sum(rate(http_request_duration_seconds_count{job="orders-service",path="/orders"}[5m]))

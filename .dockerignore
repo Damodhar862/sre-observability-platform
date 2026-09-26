@@ -1,0 +1,9 @@
+.git
+.github
+tests
+k8s
+docs
+loadtest
+monitoring
+__pycache__
+*.pyc

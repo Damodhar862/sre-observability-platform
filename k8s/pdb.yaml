@@ -1,0 +1,10 @@
+# Keeps at least one pod serving during node drains / voluntary disruptions.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: orders-service
+  namespace: orders
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: orders-service}
