@@ -4,7 +4,7 @@ A production-style reliability setup for a Python microservice: **SLIs/SLOs, err
 multi-window burn-rate alerting, Grafana dashboards, load testing, chaos experiments,
 runbooks and blameless postmortems**, deployable with Docker Compose or Kubernetes.
 
-![CI](https://github.com/<your-username>/sre-observability-platform/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Damodhar862/sre-observability-platform/actions/workflows/ci.yml/badge.svg)
 
 ## Architecture
 
@@ -30,6 +30,22 @@ runbooks and blameless postmortems**, deployable with Docker Compose or Kubernet
                                                                             +--------------+
 ```
 
+## Results
+
+**Load test (k6, 20 concurrent users, ~41 req/s):** 9,902 requests, **0.00% errors**, **p95 114ms**, all SLO thresholds passed.
+
+**Chaos game day:** injected a 50% error rate on `/orders`. Availability fell to ~85% and the burn rate rose to ~29x,
+so both burn-rate alerts fired while the latency and service-down alerts correctly stayed quiet. The runbook led to the
+cause, and the fast-burn alert resolved within minutes of mitigation. Full write-up: [docs/postmortem-example.md](docs/postmortem-example.md)
+
+| Grafana SLO dashboard during the incident |
+|---|
+| ![Grafana during incident](docs/images/grafana-incident.png) |
+
+| Burn-rate alerts firing | Fast-burn alert resolved after the fix |
+|---|---|
+| ![Alerts firing](docs/images/alert-firing.png) | ![Alert resolved](docs/images/alert-resolved.png) |
+
 ## SLOs
 | SLI | SLO | Error budget |
 |---|---|---|
@@ -48,7 +64,7 @@ docker compose up -d --build
 | App | http://localhost:8000/docs |
 | Prometheus | http://localhost:9090 (Alerts tab) |
 | Alertmanager | http://localhost:9093 |
-| Grafana | http://localhost:3000 (admin / admin) -> SRE folder |
+| Grafana | http://localhost:3000 -> Dashboards -> SRE (anonymous access enabled for local demo only) |
 
 ## Load test
 ```bash

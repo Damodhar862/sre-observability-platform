@@ -1,23 +1,24 @@
 # SLO 1: 99.5% of /orders requests succeed (non-5xx) -> error budget = 0.5%
 # SLO 2: 95% of /orders requests complete in < 300ms
+# "or vector(0)" makes the error count 0 (not "no data") when there are no errors.
 groups:
   - name: orders-slo-recording
     rules:
       - record: sli:orders_errors:ratio_rate5m
         expr: |
-          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[5m]))
+          (sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[5m])) or vector(0))
           / sum(rate(http_requests_total{job="orders-service",path="/orders"}[5m]))
       - record: sli:orders_errors:ratio_rate30m
         expr: |
-          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[30m]))
+          (sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[30m])) or vector(0))
           / sum(rate(http_requests_total{job="orders-service",path="/orders"}[30m]))
       - record: sli:orders_errors:ratio_rate1h
         expr: |
-          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[1h]))
+          (sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[1h])) or vector(0))
           / sum(rate(http_requests_total{job="orders-service",path="/orders"}[1h]))
       - record: sli:orders_errors:ratio_rate6h
         expr: |
-          sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[6h]))
+          (sum(rate(http_requests_total{job="orders-service",path="/orders",status=~"5.."}[6h])) or vector(0))
           / sum(rate(http_requests_total{job="orders-service",path="/orders"}[6h]))
       - record: sli:orders_latency:p95_5m
         expr: |
