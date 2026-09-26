@@ -21,7 +21,7 @@ and the fast-burn alert resolved within minutes of mitigation.
 | ~18:45 | Baseline load test with k6: 9,902 requests, 0% errors, p95 114ms |
 | ~19:00 | `chaos.sh errors 0.5` applied - 50% of /orders requests return 500 |
 | ~19:00 | Error ratio (5m) jumps from 0% to ~50% on the Grafana dashboard |
-| ~19:10 | `OrdersErrorBudgetFastBurn` (page) and `OrdersErrorBudgetSlowBurn` (ticket) firing |
+| 19:36 | `OrdersErrorBudgetFastBurn` (page) firing - Prometheus "Active Since" 14:06:45 UTC; it re-fired after the traffic gap |
 | ~19:27 - 19:36 | Traffic generator stopped; dashboards showed a gap in data |
 | ~19:42 | Runbook step 2: `chaos.sh status` identified error_rate=0.5 as the cause |
 | ~19:43 | Mitigation: `chaos.sh reset` |
